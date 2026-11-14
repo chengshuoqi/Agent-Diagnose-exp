@@ -16,6 +16,7 @@ import argparse
 import importlib.util
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -23,6 +24,7 @@ from dify_client import DifyError, answer_text, chat
 import config
 
 import paths
+import provenance
 
 REPO_PROMPTS = paths.REPO_PROMPTS
 
@@ -137,9 +139,22 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--include-observations", action="store_true",
                     help="ablation: also give the judge the page accessibility trees")
+    ap.add_argument("--run-id", default="",
+                    help="this batch's id; defaults to the output directory's name")
     args = ap.parse_args()
 
     prompts = load_prompts()
+
+    # rubric 的版本指纹。只对模板，不对某条轨迹，所以整批一致。
+    prompt_sha = provenance.prompt_fingerprint(
+        prompts.REASONING_QUALITY_SYSTEM_PROMPT,
+        prompts.REASONING_QUALITY_USER_PROMPT,
+        prompts.OBJECTIVE_QUALITY_SYSTEM_PROMPT,
+        prompts.OBJECTIVE_QUALITY_USER_PROMPT,
+    )
+    run_id = args.run_id or Path(args.out).parent.name
+    judge_model = "mock:deterministic" if args.mock else provenance.judge_label(config.base_url())
+
     judge_key = None if args.mock else config.judge_key()
     if not args.mock and not judge_key:
         raise SystemExit("no judge key: set DIFY_JUDGE_API_KEY (or dify-judge) in repro/.env")
@@ -178,6 +193,12 @@ def main() -> None:
             "success": traj.get("meta", {}).get("success"),
             "n_steps": traj.get("meta", {}).get("n_steps"),
             "raw_reasoning": rq,
+            # ---- provenance（issue #1）：这条分数绑定到哪条轨迹、哪版 rubric、谁、何时 ----
+            "traj_sha256": provenance.fingerprint(traj),
+            "run_id": run_id,
+            "judge_model": judge_model,
+            "prompt_sha256": prompt_sha,
+            "scored_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         }
         Path(args.out).write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"    reasoning={rq_norm['overall']:.3f} objective={oq_score}", flush=True)

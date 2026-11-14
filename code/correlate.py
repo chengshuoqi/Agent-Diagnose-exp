@@ -13,12 +13,13 @@ import csv
 import json
 import math
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 DIMS = ["backtrack_and_explore", "task_decomposition", "observation_reading",
         "self_verification", "objective_quality"]
 
 import paths
+import provenance
 
 
 def pearson(x: List[float], y: List[float]) -> Optional[float]:
@@ -133,11 +134,63 @@ def self_test() -> int:
     return failures
 
 
+def resolve_trajectories(explicit: str, scores_path: str) -> Path:
+    """去哪找轨迹：显式参数 > scores 同级的 trajectories/ > paths.TRAJECTORIES。
+
+    打印最终选择，避免"猜到了错目录"这种沉默失败。
+    """
+    if explicit:
+        return Path(explicit)
+    sibling = Path(scores_path).parent / "trajectories"
+    if sibling.is_dir():
+        return sibling
+    return Path(paths.TRAJECTORIES)
+
+
+def verify_provenance(scores, human, sheet_meta, disk):
+    """逐条比对"分数说的是哪条轨迹"与"标注表生成时看到的是哪条轨迹"。
+
+    返回 [(task_id, 检查项, 一侧, 另一侧)]；空列表表示全部通过。
+    只读不写，也不做任何自动修复——修复需要猜哪边是对的，机器不知道。
+    """
+    problems = []
+    for tid in human:
+        if tid not in scores:
+            continue
+        row = scores[tid]
+        fp = row.get("traj_sha256")
+
+        if not fp:
+            problems.append((tid, "分数行无来源指纹", "缺少 traj_sha256", "需重新判分"))
+            continue
+        if tid not in disk:
+            problems.append((tid, "磁盘上找不到该轨迹", fp[:12], "缺失"))
+            continue
+        if fp != disk[tid]["sha256"]:
+            problems.append((tid, "分数绑定的是另一条轨迹", fp[:12], disk[tid]["sha256"][:12]))
+            continue
+
+        # 标注侧：生成打分表时写下的 n_steps / success，必须与磁盘上的轨迹一致。
+        seen_steps = sheet_meta.get(tid, {}).get("n_steps")
+        if seen_steps is not None and seen_steps != disk[tid]["n_steps"]:
+            problems.append((tid, "标注表对应的是另一条轨迹",
+                             f"n_steps={seen_steps}", f"n_steps={disk[tid]['n_steps']}"))
+        seen_success = sheet_meta.get(tid, {}).get("success")
+        if seen_success != disk[tid]["success"]:
+            problems.append((tid, "标注表 success 与轨迹不一致",
+                             f"success={seen_success}", f"success={disk[tid]['success']}"))
+    return problems
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--scores", default=str(paths.SCORES))
     ap.add_argument("--annotations", default=str(paths.ANNOTATIONS))
     ap.add_argument("--out", default=str(paths.CORRELATION))
+    ap.add_argument("--trajectories", default="",
+                    help="轨迹目录；默认取 scores.json 同级的 trajectories/，再退回 output/trajectories")
+    ap.add_argument("--force-join", action="store_true",
+                    help="跳过来源校验强制出数（输出文件会被标记为不可用于结论）")
     ap.add_argument("--self-test", action="store_true",
                     help="validate the statistics on hand-computed cases and exit")
     args = ap.parse_args()
@@ -149,10 +202,36 @@ def main() -> None:
     rows = list(csv.DictReader(Path(args.annotations).open(encoding="utf-8-sig")))
 
     human: Dict[str, Dict[str, Optional[float]]] = {}
+    sheet_meta: Dict[str, Dict[str, Any]] = {}
     for row in rows:
         tid = (row.get("task_id") or "").strip()
         if tid:
             human[tid] = {d: to_float(row.get(d, "")) for d in DIMS}
+            raw_steps = (row.get("n_steps") or "").strip()
+            sheet_meta[tid] = {
+                "n_steps": int(raw_steps) if raw_steps.isdigit() else None,
+                "success": provenance.normalize_success(row.get("success")),
+            }
+
+    traj_dir = resolve_trajectories(args.trajectories, args.scores)
+    disk = provenance.scan_dir(traj_dir)
+    print(f"provenance: 轨迹目录 {traj_dir}（{len(disk)} 条可读轨迹）")
+    if not disk:
+        print("  警告：该目录下没有可读的轨迹文件，无法校验来源")
+
+    problems = verify_provenance(scores, human, sheet_meta, disk)
+    if problems:
+        label = "provenance 校验未通过（--force-join 已强制继续）" if args.force_join \
+            else "provenance 校验未通过，拒绝计算相关性"
+        print(f"\n{label}：")
+        print(f"  {'task_id':34} {'检查项':26} {'一侧':>20}  vs  {'另一侧':>20}")
+        for tid, why, mine, theirs in problems:
+            print(f"  {tid:34} {why:26} {mine:>20}  vs  {theirs:>20}")
+        print(f"\n共 {len(problems)} 处不一致。")
+        if not args.force_join:
+            print("未写输出文件。请重跑判分或重新生成标注表；"
+                  "确认差异后可用 --force-join 强制出数（结果会被标记为不可用于结论）。")
+            raise SystemExit(2)
 
     table: List[Tuple[str, Optional[float], Optional[float], Optional[float], int]] = []
     overall_x: List[float] = []
@@ -189,13 +268,19 @@ def main() -> None:
         lines.append(f"| {dim} | {fmt(r)} | {fmt(rho)} | {fmt(tau)} | {n} |")
 
     md = "\n".join(lines)
+    if problems:
+        md = ("> **WARNING**：provenance 校验未通过（`--force-join`），"
+              "本表数值不可用于结论。\n\n" + md)
     print(md)
     Path(args.out).write_text(md + "\n", encoding="utf-8")
     print(f"\nwrote {args.out}")
 
     n_auto = len(scores)
     n_human = len(human)
-    print(f"trajectories: {n_auto} scored, {n_human} annotated, {len(set(scores) & set(human))} matched")
+    both = set(scores) & set(human)
+    print(f"trajectories: {n_auto} scored, {n_human} annotated, {len(both)} matched"
+          f"（有分数未标注 {len(set(scores) - set(human))}，"
+          f"已标注无分数 {len(set(human) - set(scores))}）")
 
 
 if __name__ == "__main__":

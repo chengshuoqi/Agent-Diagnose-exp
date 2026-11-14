@@ -158,10 +158,22 @@ python -m venv .venv
       "justifications": { "维度": "judge 理由" }
     },
     "objective_quality": { "score": 1.0, "justification": "..." },
-    "success": true, "n_steps": 2
+    "success": true, "n_steps": 2,
+
+    "traj_sha256":  "949100dedb0a…",   // 这条分数绑定的是哪条轨迹（canonical JSON 的 sha256）
+    "run_id":       "A-baseline",      // 哪一批
+    "judge_model":  "dify:unknown@api.dify.ai",  // 谁打的分（设 DIFY_JUDGE_MODEL 可写实名）
+    "prompt_sha256":"13e76676…",       // 哪版 rubric（模板的哈希，整批一致）
+    "scored_at":    "2026-11-14T10:11:54Z"
   }
 }
 ```
+
+后五个字段是 provenance（见 `code/provenance.py`）。`correlate.py` 在拼接前会重算磁盘轨迹的
+哈希并比对，**对不上就 exit 2、不写输出**；只有 `--force-join` 能强制出数，且输出文件头会被打上
+`WARNING`。没有这五个字段的旧 `scores.json` 会被判为「无法验证」而拒绝——这是刻意的，不是 bug。
+
+哈希口径是 **canonical JSON**（`sort_keys`、无多余空白、UTF-8），所以只改缩进/换行不会让指纹变化。
 
 ### `output/annotations.csv`
 
