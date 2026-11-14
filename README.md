@@ -7,6 +7,10 @@
 - 依赖本地 **WebArena shopping 容器**与 **Dify 应用密钥**，二者均不随仓库分发
 - 实验产出（`output/`）不入库，按下方流程在本地生成
 
+> **现状与改造计划**见 [`docs/施工地图.md`](docs/施工地图.md)（阶段、验收命令、不做清单）。
+> 产物来源的一致性取证见 [`docs/evidence/baseline-drift.md`](docs/evidence/baseline-drift.md)：现有 `output/` 中
+> 分数表与轨迹来自不同批次，8/10 条对不上，`correlation.md` 的数值因此不成立。
+
 ---
 
 ## 1. 目录结构
