@@ -12,6 +12,9 @@
 > **现状与改造计划**见 [`docs/施工地图.md`](docs/施工地图.md)（阶段、验收命令、不做清单）。
 > 产物来源的一致性取证见 [`docs/evidence/baseline-drift.md`](docs/evidence/baseline-drift.md)：第一轮产物中
 > 分数表与轨迹来自不同批次，8/10 条对不上，当时 `correlation.md` 的数值因此不成立。
+>
+> **实验已于 2026-11-14 结项。** 已知不可测项（`backtrack` 维度）见报告 §3.4，其余局限见 §7；
+> 11 个 issue 全部关闭（8 个 completed、3 个 not planned）。
 
 ---
 
