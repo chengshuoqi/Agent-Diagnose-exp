@@ -8,9 +8,10 @@
 - 实验产出（`output/runs/<run_id>/`）不入库，按下方流程在本地生成
 - 每次运行的每条分数都带**轨迹指纹**；分数与轨迹对不上时 `correlate` 拒绝出数，而不是给一个数
 
+> **实验报告**见 [`docs/实验报告.md`](docs/实验报告.md)；**验收记录**见 [`docs/验收记录.md`](docs/验收记录.md)。
 > **现状与改造计划**见 [`docs/施工地图.md`](docs/施工地图.md)（阶段、验收命令、不做清单）。
-> 产物来源的一致性取证见 [`docs/evidence/baseline-drift.md`](docs/evidence/baseline-drift.md)：现有 `output/` 中
-> 分数表与轨迹来自不同批次，8/10 条对不上，`correlation.md` 的数值因此不成立。
+> 产物来源的一致性取证见 [`docs/evidence/baseline-drift.md`](docs/evidence/baseline-drift.md)：第一轮产物中
+> 分数表与轨迹来自不同批次，8/10 条对不上，当时 `correlation.md` 的数值因此不成立。
 
 ---
 
