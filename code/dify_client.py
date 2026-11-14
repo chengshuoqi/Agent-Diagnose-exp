@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 import os
+import random
+import ssl
 import time
 import urllib.error
 import urllib.request
@@ -24,6 +26,18 @@ DEFAULT_BASE = os.environ.get("DIFY_API_BASE", "https://api.dify.ai/v1")
 
 class DifyError(RuntimeError):
     pass
+
+
+# 可重试的异常：网络层抖动、超时、TLS 握手失败（SSLEOFError 是其中一种）
+_TRANSIENT_EXC = (urllib.error.URLError, TimeoutError, ConnectionError, ssl.SSLError)
+
+# 可重试的 HTTP 状态码（限流与网关类）
+_RETRYABLE_STATUS = (429, 500, 502, 503, 504)
+
+
+def _retryable_dify_error(exc: DifyError) -> bool:
+    message = str(exc)
+    return any(f"HTTP {code}" in message for code in _RETRYABLE_STATUS)
 
 
 def chat(
@@ -58,7 +72,7 @@ def chat(
     }
 
     if _MODE.get(base) == "streaming":
-        return _chat_stream(base, key, payload, timeout)
+        return _chat_stream_retry(base, key, payload, timeout, retries)
 
     last_err: Exception | None = None
     for attempt in range(retries + 1):
@@ -80,7 +94,7 @@ def chat(
             if exc.code == 400 and ("streaming response mode" in detail
                                     or "does not support blocking mode" in detail):
                 _MODE[base] = "streaming"
-                return _chat_stream(base, key, payload, timeout)
+                return _chat_stream_retry(base, key, payload, timeout, retries)
             if exc.code in (429, 500, 502, 503, 504) and attempt < retries:
                 time.sleep(2 * (attempt + 1))
                 last_err = DifyError(f"HTTP {exc.code}: {detail}")
@@ -96,6 +110,31 @@ def chat(
 
 
 _MODE: dict[str, str] = {}
+
+
+def _chat_stream_retry(base: str, key: str, payload: dict, timeout: int, retries: int) -> dict:
+    """流式请求的重试包装。
+
+    Agent 应用只接受 streaming，所以**这条路径才是实际在跑的那条**；而原实现里
+    `retries` 只作用于 blocking 分支，流式分支一次失败就直接抛——网络抖一下就
+    等于一条轨迹作废。2026-11-14 的 B 批次 6/10 条轨迹被截断，原因就在这里。
+    """
+    last: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            return _chat_stream(base, key, payload, timeout)
+        except DifyError as exc:
+            if not _retryable_dify_error(exc):
+                raise
+            last = exc
+        except _TRANSIENT_EXC as exc:
+            last = exc
+        if attempt < retries:
+            delay = 1.5 * (2 ** attempt) + random.uniform(0, 0.5)
+            print(f"    Dify 请求失败（{type(last).__name__}: {str(last)[:80]}），"
+                  f"{delay:.1f}s 后重试 {attempt + 1}/{retries}", flush=True)
+            time.sleep(delay)
+    raise DifyError(f"request to Dify failed after {retries + 1} attempts: {last}") from last
 
 
 def _chat_stream(base: str, key: str, payload: dict, timeout: int) -> dict:

@@ -142,6 +142,15 @@ docker ps --filter "name=webarena-verified-shopping" --format "{{.Names}} {{.Sta
 
 - 过：`output\runs\B-refactor\trajectories\` 有 10 个 json，且生成了 `run.json`。
 - 不过：出现 `*.failed.json` 说明那条是 0 步崩溃。**先处理掉再进第 2 步**——判分会忽略它，但你的任务集就少一条。
+- **必须再查一遍 `meta.error`**（2026-11-14 的 B 批次就栽在这里：5/10 条被 TLS 抖动截断，
+  其中 3 条 0 步，相关性表面上 `r≈0.90`，实际上是被空轨迹抬起来的）：
+
+```powershell
+.\.venv\Scripts\python.exe -c "import json,glob; [print(p.split(chr(92))[-1][:-5], json.load(open(p,encoding='utf-8'))['meta']['error']) for p in glob.glob('output/runs/B-refactor/trajectories/*.json') if json.load(open(p,encoding='utf-8'))['meta'].get('error')]"
+```
+
+  有输出就**重跑那几条**（`--only t03_x,t05_y --overwrite`），别带着截断的轨迹往下走。客户端现在对流式请求
+  有 3 次指数退避重试，单次抖动一般能救回来。
 
 **2. 判分 + 验指纹**
 
@@ -278,12 +287,6 @@ docker ps --filter "name=webarena-verified-shopping" --format "{{.Names}} {{.Sta
 | overall（各维 r 的均值） | 0.81 | - | - | 41 | 43 | 4 个维度参与 |
 ```
 
-两列 `n` 是刻意的：**标注过几条**（`n（标注）`）不等于**能配对几条**（`n（配对）`）。
-只有标注没有机器分（或反过来）的行会体现在两者的差额里；`n < 3` 时备注写「样本不足」而不是给一个 `-`。
-
-`overall` 不再用「把所有维度的观测堆成一个大数组」算 pooled 相关（issue #5）：10 条轨迹 × 4 维 = 41 个
-观测并不独立，pooled 的 `n` 会虚高、区间会假窄。现在报的是**各维 r 的均值**。
-
 ---
 
 ## 5. 参数速查
@@ -336,6 +339,13 @@ docker ps --filter "name=webarena-verified-shopping" --format "{{.Names}} {{.Sta
    `utf-8-sig → gbk` 回退并给出提示，但别依赖它——2026-11-14 就因为存成 GBK 直接崩过一次。
 8. **旧产物会被拒绝**：没有 `traj_sha256` 五个字段的 `scores.json`，`correlate` 一律判为「无法验证」。
    这是刻意的；`output/` 与 `output/runs/A-baseline/` 属于此类，要复算得加 `--force-join`。
+9. **网络抖动会毁掉一整条轨迹**：Dify Agent 应用只走流式，早期的 `retries` 参数对流式无效，
+   一次 TLS 抖动（`URLError: SSL: UNEXPECTED_EOF_WHILE_READING`）就让这条轨迹 0 步收场。
+   现在流式路径也有 3 次指数退避重试；即便如此，**判分前仍要检查 `meta.error`**——截断的轨迹会让
+   相关系数虚高（空轨迹人人给低分，天然"一致"）。`correlate` 会提示带 `error` 的条数，
+   `--exclude-errors` 可单独看"只算正常结束"的版本。
+10. **标注表编码**：Excel/WPS 默认存 GBK。`correlate` 能读，但想让文件干净就跑
+    `code\normalize_annotations.py`（带备份，幂等）。
 
 ---
 

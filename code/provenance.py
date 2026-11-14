@@ -48,6 +48,7 @@ def scan_dir(directory: Path | str) -> Dict[str, Dict[str, Any]]:
             "sha256": fingerprint(traj),
             "n_steps": len(traj.get("actions", [])),
             "success": meta.get("success"),
+            "error": meta.get("error") or "",
         }
     return out
 

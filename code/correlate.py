@@ -216,6 +216,8 @@ def main() -> None:
                     help="轨迹目录；默认取 scores.json 同级的 trajectories/，再退回 output/trajectories")
     ap.add_argument("--force-join", action="store_true",
                     help="跳过来源校验强制出数（输出文件会被标记为不可用于结论）")
+    ap.add_argument("--exclude-errors", action="store_true",
+                    help="排除 meta.error 非空的轨迹（网络/环境截断的那种）")
     ap.add_argument("--self-test", action="store_true",
                     help="validate the statistics on hand-computed cases and exit")
     args = ap.parse_args()
@@ -262,6 +264,18 @@ def main() -> None:
             print("未写输出文件。请重跑判分或重新生成标注表；"
                   "确认差异后可用 --force-join 强制出数（结果会被标记为不可用于结论）。")
             raise SystemExit(2)
+
+    # 网络/环境导致的截断写在 meta.error 里；它们不是"能力差异"，
+    # 混进相关性会把"agent 不会做"和"agent 没来得及做"算成同一件事。
+    errored = sorted(tid for tid, info in disk.items() if info.get("error"))
+    if errored:
+        print(f"  注意：{len(errored)}/{len(disk)} 条轨迹带 error（环境或策略中断，不是能力差异）："
+              f"{', '.join(errored[:6])}{' …' if len(errored) > 6 else ''}")
+        if args.exclude_errors:
+            for tid in errored:
+                human.pop(tid, None)
+                scores.pop(tid, None)
+            print(f"  已按 --exclude-errors 排除，剩余 {len(human)} 条参与计算。")
 
     table: List[Tuple[str, Optional[float], Optional[float], Optional[float], int, int, str]] = []
     dim_rs: List[float] = []
