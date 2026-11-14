@@ -32,21 +32,45 @@ DIMENSIONS = ["backtrack_and_explore", "task_decomposition", "observation_readin
 
 
 def load_prompts():
-    """Import the repo's prompt module by path (avoids importing the package)."""
+    """返回仓内的 rubric 快照模块（`code/prompts/agentdiagnose_rubric.py`）。
+
+    不再在运行期读 `../AgentDiagnose-main`（issue #4）：那条路径不在版本库里、
+    也没有 pin commit，rubric 会随外部文件静默漂移，而产物的 `prompt_sha256`
+    也就失去了意义。
+    """
+    from prompts import agentdiagnose_rubric
+
+    return agentdiagnose_rubric
+
+
+PROMPT_ATTRS = (
+    "REASONING_QUALITY_SYSTEM_PROMPT",
+    "REASONING_QUALITY_USER_PROMPT",
+    "OBJECTIVE_QUALITY_SYSTEM_PROMPT",
+    "OBJECTIVE_QUALITY_USER_PROMPT",
+)
+
+
+def compare_with_upstream() -> int:
+    """把快照与同级克隆逐字比对；返回不一致的条数。只读，不改任何文件。"""
     if not REPO_PROMPTS.exists():
-        raise SystemExit(
-            "找不到 AgentDiagnose 仓库的 prompt 文件：\n"
-            f"  {REPO_PROMPTS}\n"
-            "本复现工程不内置上游代码，请把上游仓库克隆到本项目的同级目录（目录名必须是 AgentDiagnose-main）：\n"
-            "  git clone https://github.com/oootttyyy/AgentDiagnose.git ../AgentDiagnose-main\n"
-            "克隆后第 ② 步即可正常运行。"
-        )
+        print(f"上游 prompt 不存在：{REPO_PROMPTS}（跳过比对）")
+        return 0
     spec = importlib.util.spec_from_file_location("agentdiagnose_prompts", REPO_PROMPTS)
     if spec is None or spec.loader is None:
-        raise SystemExit(f"cannot load prompts from {REPO_PROMPTS}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+        print(f"无法加载上游 prompt：{REPO_PROMPTS}")
+        return 1
+    upstream = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(upstream)
+    local = load_prompts()
+    bad = 0
+    for name in PROMPT_ATTRS:
+        a, b = getattr(upstream, name, None), getattr(local, name, None)
+        same = a == b
+        bad += 0 if same else 1
+        print(f"{'SAME' if same else 'DIFF'}  {name}")
+    print(f"\n{'快照与上游逐字一致' if bad == 0 else f'{bad} 处不一致'}")
+    return bad
 
 
 def format_steps(traj: Dict[str, Any], max_steps: int = 30,
@@ -113,7 +137,11 @@ def judge_objective(prompts, traj, judge_key, mock=False) -> Dict[str, Any]:
 
 
 def normalize(raw: Dict[str, Any]) -> Dict[str, Any]:
-    """Mirror ReasoningQualityScorer.parse_response: /4, N/A drops the dimension."""
+    """Mirror ReasoningQualityScorer.parse_response: /4, N/A drops the dimension.
+
+    同时记录"这条分数是由哪几个维度算出来的"（issue #5）：N/A 不进均值本身没问题，
+    问题是**分母变了却不留痕**，导致同一批里不同轨迹的总分不可横比。
+    """
     subs = {}
     for dim in DIMENSIONS:
         item = raw.get(dim) or {}
@@ -125,23 +153,34 @@ def normalize(raw: Dict[str, Any]) -> Dict[str, Any]:
                 subs[dim] = float(score) / 4.0
             except (TypeError, ValueError):
                 subs[dim] = None
-    used = [v for v in subs.values() if v is not None]
-    overall = sum(used) / len(used) if used else None
+    used = {d: v for d, v in subs.items() if v is not None}
+    overall = sum(used.values()) / len(used) if used else None
     return {"dimensions": subs, "overall": overall,
+            "dimensions_used": list(used),
+            "n_dims_used": len(used),
             "justifications": {d: (raw.get(d) or {}).get("justification", "") for d in DIMENSIONS}}
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", default=str(paths.TRAJECTORIES))
-    ap.add_argument("--out", default=str(paths.SCORES))
+    ap.add_argument("--out", default="",
+                    help="默认写到 input 的同级目录：<run>/scores.json（issue #3：按 run 隔离）")
     ap.add_argument("--mock", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--include-observations", action="store_true",
                     help="ablation: also give the judge the page accessibility trees")
     ap.add_argument("--run-id", default="",
                     help="this batch's id; defaults to the output directory's name")
+    ap.add_argument("--check-prompts", action="store_true",
+                    help="只把 rubric 快照与 ../AgentDiagnose-main 逐字比对，然后退出")
     args = ap.parse_args()
+
+    if args.check_prompts:
+        raise SystemExit(compare_with_upstream())
+
+    if not args.out:
+        args.out = str(Path(args.input).parent / "scores.json")
 
     prompts = load_prompts()
 
@@ -158,13 +197,19 @@ def main() -> None:
     judge_key = None if args.mock else config.judge_key()
     if not args.mock and not judge_key:
         raise SystemExit("no judge key: set DIFY_JUDGE_API_KEY (or dify-judge) in repro/.env")
-    files = sorted(Path(args.input).glob("*.json"))
+    files = sorted(p for p in Path(args.input).glob("*.json")
+                   if not p.name.endswith(".failed.json"))
     if args.limit:
         files = files[: args.limit]
 
     results: Dict[str, Any] = {}
     if Path(args.out).exists():
-        results = json.loads(Path(args.out).read_text(encoding="utf-8"))
+        existing = json.loads(Path(args.out).read_text(encoding="utf-8"))
+        stale = [t for t, row in existing.items() if "traj_sha256" not in row]
+        if stale:
+            print(f"注意：{Path(args.out)} 里有 {len(stale)} 条旧口径记录（无来源指纹）。"
+                  f"它们会被保留，但 correlate 会拒绝使用。建议挪走该文件重跑。")
+        results = existing
 
     for path in files:
         traj = json.loads(path.read_text(encoding="utf-8"))

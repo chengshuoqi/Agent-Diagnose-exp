@@ -125,16 +125,47 @@ def write_markdown(trajs: list, path: Path, reasoning_chars: int, obs_chars: int
     path.write_text("\n".join(out), encoding="utf-8")
 
 
+def _filled_cells(path: Path) -> int:
+    """数一份标注表里已经填了多少个格子（只读；读不了就当 0）。"""
+    if not path.exists():
+        return 0
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as fh:
+            reader = csv.DictReader(fh)
+            return sum(1 for row in reader for dim in DIMS if (row.get(dim) or "").strip())
+    except (UnicodeDecodeError, OSError):
+        # 被 Excel 存成 GBK 等情况：宁可当成"有内容"也不要覆盖
+        return -1
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", default=str(paths.TRAJECTORIES))
-    ap.add_argument("--out", default=str(paths.ANNOTATIONS))
-    ap.add_argument("--md", default=str(paths.ANNOTATIONS_MD))
+    ap.add_argument("--out", default="",
+                    help="默认写到 input 的同级目录：<run>/annotations.csv")
+    ap.add_argument("--md", default="",
+                    help="默认写到 input 的同级目录：<run>/annotations.md")
     ap.add_argument("--reasoning-chars", type=int, default=500)
     ap.add_argument("--obs-chars", type=int, default=320, help="0 = 不显示页面观测")
+    ap.add_argument("--force", action="store_true",
+                    help="目标标注表里已经有分数时，仍然覆盖（会丢掉已填的内容）")
     args = ap.parse_args()
 
-    files = sorted(Path(args.input).glob("*.json"))
+    run_dir = Path(args.input).parent
+    if not args.out:
+        args.out = str(run_dir / "annotations.csv")
+    if not args.md:
+        args.md = str(run_dir / "annotations.md")
+
+    # issue #6：绝不静默清空已填的标注。这一步曾经真的丢过 50 个格子。
+    filled = _filled_cells(Path(args.out))
+    if filled != 0 and not args.force:
+        print(f"拒绝覆盖：{args.out} 里已有 {filled if filled > 0 else '未知数量'} 个已填格子。")
+        print("  换一个 --out，或确认要丢弃后用 --force。")
+        raise SystemExit(2)
+
+    files = sorted(p for p in Path(args.input).glob("*.json")
+                   if not p.name.endswith(".failed.json"))
     if not files:
         raise SystemExit(f"no trajectories in {args.input}; run run_episodes.py first")
 

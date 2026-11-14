@@ -32,6 +32,9 @@ ANNOTATIONS = OUTPUT / "annotations.csv"
 ANNOTATIONS_MD = OUTPUT / "annotations.md"
 CORRELATION = OUTPUT / "correlation.md"
 
+# 每次运行各占一个子目录（issue #3）：output/runs/<run_id>/{trajectories,scores.json,...}
+RUNS = OUTPUT / "runs"
+
 # AgentDiagnose 仓库（论文原始 prompt 从这里按路径加载）
 REPO = WORKSPACE / "AgentDiagnose-main"
 REPO_PROMPTS = REPO / "evaluator" / "scorers" / "prompts" / "prompt.py"

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
 import math
 from pathlib import Path
@@ -134,6 +135,28 @@ def self_test() -> int:
     return failures
 
 
+def read_rows(path: Path) -> List[Dict[str, str]]:
+    """读标注表，容忍 Excel/WPS 把它存成 GBK。
+
+    这不是理论风险：2026-11-14 就因为另存成 GBK，`correlate` 直接抛 UnicodeDecodeError
+    （见 issue #6 的评论）。顺序 utf-8-sig → gbk → utf-8，全失败时给人话提示。
+    """
+    raw = path.read_bytes()
+    for enc in ("utf-8-sig", "gbk", "utf-8"):
+        try:
+            text = raw.decode(enc)
+        except UnicodeDecodeError:
+            continue
+        if enc != "utf-8-sig":
+            print(f"注意：{path.name} 不是 UTF-8（按 {enc} 读取）。"
+                  "用 Excel/WPS 另存为「CSV UTF-8」可避免下次再遇到。")
+        return list(csv.DictReader(io.StringIO(text)))
+    raise SystemExit(
+        f"无法解码标注表：{path}\n"
+        "请用 Excel/WPS 打开后另存为「CSV UTF-8」，或用文本编辑器转成 UTF-8。"
+    )
+
+
 def resolve_trajectories(explicit: str, scores_path: str) -> Path:
     """去哪找轨迹：显式参数 > scores 同级的 trajectories/ > paths.TRAJECTORIES。
 
@@ -185,8 +208,10 @@ def verify_provenance(scores, human, sheet_meta, disk):
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--scores", default=str(paths.SCORES))
-    ap.add_argument("--annotations", default=str(paths.ANNOTATIONS))
-    ap.add_argument("--out", default=str(paths.CORRELATION))
+    ap.add_argument("--annotations", default="",
+                    help="默认取 scores.json 同级的 annotations.csv（issue #3：按 run 隔离）")
+    ap.add_argument("--out", default="",
+                    help="默认写到 scores.json 同级的 correlation.md（issue #3：按 run 隔离）")
     ap.add_argument("--trajectories", default="",
                     help="轨迹目录；默认取 scores.json 同级的 trajectories/，再退回 output/trajectories")
     ap.add_argument("--force-join", action="store_true",
@@ -198,8 +223,13 @@ def main() -> None:
     if args.self_test:
         raise SystemExit(self_test())
 
+    if not args.out:
+        args.out = str(Path(args.scores).parent / "correlation.md")
+    if not args.annotations:
+        args.annotations = str(Path(args.scores).parent / "annotations.csv")
+
     scores = json.loads(Path(args.scores).read_text(encoding="utf-8"))
-    rows = list(csv.DictReader(Path(args.annotations).open(encoding="utf-8-sig")))
+    rows = read_rows(Path(args.annotations))
 
     human: Dict[str, Dict[str, Optional[float]]] = {}
     sheet_meta: Dict[str, Dict[str, Any]] = {}
@@ -233,15 +263,18 @@ def main() -> None:
                   "确认差异后可用 --force-join 强制出数（结果会被标记为不可用于结论）。")
             raise SystemExit(2)
 
-    table: List[Tuple[str, Optional[float], Optional[float], Optional[float], int]] = []
-    overall_x: List[float] = []
-    overall_y: List[float] = []
+    table: List[Tuple[str, Optional[float], Optional[float], Optional[float], int, int, str]] = []
+    dim_rs: List[float] = []
 
     for dim in DIMS:
         xs, ys = [], []
+        n_human = 0
         for tid, hs in human.items():
             if tid not in scores:
                 continue
+            h = hs.get(dim)
+            if h is not None:
+                n_human += 1
             auto = scores[tid]
             if dim == "objective_quality":
                 a = auto.get("objective_quality", {}).get("score")
@@ -249,23 +282,37 @@ def main() -> None:
             else:
                 a = auto.get("reasoning_quality", {}).get("dimensions", {}).get(dim)
                 a = a * 4 if a is not None else None
-            h = hs.get(dim)
             if a is None or h is None:
                 continue
             xs.append(h)
             ys.append(a)
-        table.append((dim, pearson(xs, ys), spearman(xs, ys), kendall_tau_b(xs, ys), len(xs)))
-        overall_x.extend(xs)
-        overall_y.extend(ys)
 
-    table.append(("overall (pooled)", pearson(overall_x, overall_y),
-                  spearman(overall_x, overall_y), kendall_tau_b(overall_x, overall_y), len(overall_x)))
+        r = pearson(xs, ys)
+        note = ""
+        if not xs:
+            note = "无可用样本"
+        elif len(xs) < 3:
+            note = "样本不足"
+        elif r is None:
+            note = "某一侧无方差（算不出 r）"
+        elif n_human > len(xs):
+            note = f"{n_human - len(xs)} 条只有标注没有机器分"
+        table.append((dim, r, spearman(xs, ys), kendall_tau_b(xs, ys), len(xs), n_human, note))
+        if r is not None:
+            dim_rs.append(r)
 
-    lines = ["| Dimension | Pearson r | Spearman rho | Kendall tau | n |",
-             "|---|---|---|---|---|"]
-    for dim, r, rho, tau, n in table:
+    # issue #5：不再把各维观测堆成一个大数组算 "pooled"。
+    # 10 条轨迹 × 4 维 = 41 个观测并不独立，pooled 的 n 会虚高、区间会假窄。
+    # 正确做法是报"各维 r 的均值"，并让人看得到每维的 n。
+    overall_r = sum(dim_rs) / len(dim_rs) if dim_rs else None
+    table.append(("overall（各维 r 的均值）", overall_r, None, None, sum(t[4] for t in table),
+                  sum(t[5] for t in table), f"{len(dim_rs)} 个维度参与"))
+
+    lines = ["| 维度 | Pearson r | Spearman rho | Kendall tau | n（配对） | n（标注） | 备注 |",
+             "|---|---|---|---|---|---|---|"]
+    for dim, r, rho, tau, n, n_h, note in table:
         fmt = lambda v: "-" if v is None else f"{v:.2f}"
-        lines.append(f"| {dim} | {fmt(r)} | {fmt(rho)} | {fmt(tau)} | {n} |")
+        lines.append(f"| {dim} | {fmt(r)} | {fmt(rho)} | {fmt(tau)} | {n} | {n_h} | {note} |")
 
     md = "\n".join(lines)
     if problems:

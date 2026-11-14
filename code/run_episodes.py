@@ -1,4 +1,4 @@
-﻿"""Run shopping episodes on the local WebArena shopping container and record
+"""Run shopping episodes on the local WebArena shopping container and record
 trajectories in AgentDiagnose's JSON format.
 
     python run_episodes.py --policy scripted --limit 2
@@ -14,6 +14,7 @@ import json
 import os
 import re
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -22,6 +23,7 @@ from dify_client import DifyError
 from policies import DifyPolicy, ScriptedPolicy
 
 import paths
+import provenance
 
 
 def load_tasks(path: Path) -> List[Dict[str, Any]]:
@@ -105,7 +107,7 @@ def run_task(task: Dict[str, Any], policy, args) -> Dict[str, Any]:
             success = None
         if args.screenshots:
             try:
-                shot = paths.TRAJECTORIES / "shots" / f"{task['id']}.png"
+                shot = Path(args.out) / "shots" / f"{task['id']}.png"
                 shot.parent.mkdir(parents=True, exist_ok=True)
                 session.page.screenshot(path=str(shot))
             except Exception:
@@ -117,7 +119,8 @@ def run_task(task: Dict[str, Any], policy, args) -> Dict[str, Any]:
         "objective": task["objective"],
         "actions": steps,
         "task_website": "localhost:7770",
-        "reward": -1 if success is None else int(success),
+        # 三态：1 成功 / 0 失败 / null 不适用（issue #7）。不再用 -1 冒充"不适用"。
+        "reward": None if success is None else int(success),
         "meta": {
             "task_id": task["id"],
             "policy": args.policy,
@@ -161,7 +164,10 @@ def _action_arg(action: str) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tasks", default=str(paths.TASKS))
-    ap.add_argument("--out", default=str(paths.TRAJECTORIES))
+    ap.add_argument("--out", default="",
+                    help="轨迹目录；默认 output/runs/<run-id>/trajectories")
+    ap.add_argument("--run-id", default="",
+                    help="本次运行的标识；默认 <时间戳>-<policy>")
     ap.add_argument("--policy", choices=["dify", "scripted"], default="scripted")
     ap.add_argument("--limit", type=int, default=0, help="only run the first N tasks")
     ap.add_argument("--max-steps", type=int, default=8)
@@ -171,6 +177,8 @@ def main() -> None:
     ap.add_argument("--verbose", action="store_true", help="print each action and the raw LLM answer")
     ap.add_argument("--screenshots", action="store_true")
     ap.add_argument("--only", default="", help="comma separated task ids")
+    ap.add_argument("--overwrite", action="store_true",
+                    help="允许覆盖输出目录里已有的同名轨迹（默认跳过，见 issue #3）")
     args = ap.parse_args()
 
     tasks = load_tasks(Path(args.tasks))
@@ -180,22 +188,53 @@ def main() -> None:
     if args.limit:
         tasks = tasks[: args.limit]
 
+    run_id = args.run_id or (time.strftime("%Y%m%dT%H%M") + "-" + args.policy)
+    out = Path(args.out) if args.out else paths.RUNS / run_id / "trajectories"
+    run_dir = out.parent
+    out.mkdir(parents=True, exist_ok=True)
+    args.out = str(out)          # run_task 用它决定截图落点
+
     policy = ScriptedPolicy() if args.policy == "scripted" else DifyPolicy()
 
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
+    started = time.time()
+    written: List[str] = []
+    skipped: List[str] = []
     for task in tasks:
+        path = out / f"{task['id']}.json"
+        if path.exists() and not args.overwrite:
+            print(f"[{task['id']}] 已存在，跳过（--overwrite 可覆盖）", flush=True)
+            skipped.append(task["id"])
+            continue
         print(f"[{task['id']}] running ...", flush=True)
         record = run_task(task, policy, args)
-        path = out / f"{task['id']}.json"
-        meta = record["meta"]
-        # Never let a crashed run (0 steps + error) overwrite a good trajectory.
-        if path.exists() and meta["n_steps"] == 0 and meta.get("error"):
-            path = out / f"{task['id']}.failed.json"
-            print("    (kept the existing trajectory; failure written aside)", flush=True)
         path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+        meta = record["meta"]
+        written.append(task["id"])
         print(f"    steps={meta['n_steps']} success={meta['success']} error={meta['error']} "
               f"({meta['elapsed_s']}s) -> {path.name}", flush=True)
+
+    manifest = {
+        "run_id": run_id,
+        "policy": args.policy,
+        "base_url": args.base_url,
+        "tasks_file": str(Path(args.tasks).resolve()),
+        "tasks_sha256": provenance.fingerprint(load_tasks(Path(args.tasks))),
+        "n_tasks": len(tasks),
+        "written": written,
+        "skipped": skipped,
+        "started_at": datetime.fromtimestamp(started, timezone.utc)
+        .isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "finished_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "elapsed_s": round(time.time() - started, 1),
+    }
+    (run_dir / "run.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    print(f"\nrun dir : {run_dir}")
+    print(f"written : {len(written)}   skipped: {len(skipped)}")
+    if skipped:
+        print(f"跳过（已存在，未覆盖）: {', '.join(skipped)}")
 
 
 if __name__ == "__main__":
