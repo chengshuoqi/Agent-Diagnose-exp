@@ -1,0 +1,102 @@
+[
+  {
+    "id": "t01_backpack_first_price",
+    "objective": "Search for 'backpack' on the shopping site and report the price of the first product in the search results.",
+    "start_url": "http://localhost:7770/",
+    "query": "backpack",
+    "check": "answer",
+    "answer_keywords": ["119.99"],
+    "max_steps": 6,
+    "note": "ground truth: first result is Endurax Extra Large Camera Backpack at $119.99"
+  },
+  {
+    "id": "t02_add_home_product",
+    "objective": "Add the first product shown on the home page to your shopping cart.",
+    "start_url": "http://localhost:7770/",
+    "query": null,
+    "check": "cart",
+    "answer_keywords": ["Gingerbread"],
+    "max_steps": 6,
+    "note": "ground truth: first home-page product is the Pre-baked Gingerbread House Kit"
+  },
+  {
+    "id": "t03_cheapest_backpack",
+    "objective": "Among the 'backpack' search results on the first page, find the product with the lowest price and report its brand name.",
+    "start_url": "http://localhost:7770/",
+    "query": "backpack",
+    "check": "answer",
+    "answer_keywords": ["ERIHOP"],
+    "max_steps": 8,
+    "note": "ground truth: ERIHOP Black Backpack Purse at $24.98"
+  },
+  {
+    "id": "t04_coffee_under_20",
+    "objective": "Search for 'coffee maker' and add any product priced below $20 to your cart.",
+    "start_url": "http://localhost:7770/",
+    "query": "coffee maker",
+    "check": "cart",
+    "answer_keywords": ["UCC Coffee", "Caramel Swirl", "Play House"],
+    "max_steps": 8,
+    "note": "candidates: UCC $18.00, Caramel Swirl $11.31, Play House $10.99"
+  },
+  {
+    "id": "t05_no_results",
+    "objective": "Search for the product 'xyzzy123' and report what the site shows for this query.",
+    "start_url": "http://localhost:7770/",
+    "query": "xyzzy123",
+    "check": "answer",
+    "answer_keywords": ["no results", "could not find", "nothing", "0 item", "not find"],
+    "max_steps": 6,
+    "note": "negative-result handling; tests observation reading"
+  },
+  {
+    "id": "t06_product_page_price",
+    "objective": "Find the camera backpack made by Endurax, open its product page, and report its listed price.",
+    "start_url": "http://localhost:7770/",
+    "query": "camera backpack",
+    "check": "answer",
+    "answer_keywords": ["119.99"],
+    "max_steps": 8,
+    "note": "requires opening a product detail page"
+  },
+  {
+    "id": "t07_cart_status",
+    "objective": "Open the shopping cart page and report whether the cart is currently empty.",
+    "start_url": "http://localhost:7770/",
+    "query": null,
+    "check": "answer",
+    "answer_keywords": ["yes", "empty"],
+    "max_steps": 6,
+    "note": "each episode starts in a fresh guest session, so the cart is empty"
+  },
+  {
+    "id": "t08_most_expensive_backpack",
+    "objective": "Among the 'backpack' search results on the first page, which product is the most expensive? Report its price.",
+    "start_url": "http://localhost:7770/",
+    "query": "backpack",
+    "check": "answer",
+    "answer_keywords": ["284.95"],
+    "max_steps": 8,
+    "note": "ground truth: Lowpro LP36776 Lens Trekker at $284.95"
+  },
+  {
+    "id": "t09_vague_kitchen",
+    "objective": "Get something useful for the kitchen.",
+    "start_url": "http://localhost:7770/",
+    "query": null,
+    "check": "none",
+    "answer_keywords": [],
+    "max_steps": 8,
+    "note": "deliberately vague objective -> low objective_quality, gives variance for the correlation study"
+  },
+  {
+    "id": "t10_vague_gift",
+    "objective": "Buy a nice gift for a friend.",
+    "start_url": "http://localhost:7770/",
+    "query": null,
+    "check": "none",
+    "answer_keywords": [],
+    "max_steps": 8,
+    "note": "deliberately vague objective -> low objective_quality"
+  }
+]

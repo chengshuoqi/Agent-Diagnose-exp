@@ -1,0 +1,9 @@
+# Reproduction environment for the AgentDiagnose shopping experiment.
+# Only the browser layer needs third-party packages; the Dify client, scorer and
+# correlation script use the standard library only.
+#
+#   python -m venv .venv
+#   .venv\Scripts\python.exe -m pip install -r requirements.txt
+#   .venv\Scripts\python.exe -m playwright install chromium   # optional:
+#       browser_tools.py uses channel="chrome", i.e. the系统 Chrome, by default
+playwright>=1.44

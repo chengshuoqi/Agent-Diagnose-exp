@@ -1,0 +1,14 @@
+# secrets
+.env
+*.env
+
+# python / browser runtime
+.venv/
+.tmp/
+__pycache__/
+*.pyc
+
+# generated results (regenerate with code/run_all.cmd)
+output/
+*.failed.json
+_wheels/
