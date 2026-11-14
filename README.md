@@ -35,7 +35,8 @@
 │   ├── run_all.cmd / .ps1    #   一键串起 ①→③ 并停等人工标注
 │   └── requirements.txt      #   Python 依赖（只有 playwright）
 ├── data/
-│   └── tasks_shopping.json   # 实验输入：10 条任务定义
+│   ├── tasks_shopping.json   # 实验输入：10 条任务定义（A/B 两批共用）
+│   └── tasks_backtrack.json  # 回退专项任务（#8）：ground truth 已核对，当前 agent 跑不通
 ├── docs/
 │   ├── 施工地图.md            # 阶段、验收命令、不做清单
 │   ├── evidence/             # 产物来源的取证（漂移对照表 + 哈希）

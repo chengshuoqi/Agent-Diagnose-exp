@@ -1,0 +1,22 @@
+[
+  {
+    "id": "t11_remove_expensive_from_cart",
+    "objective": "Search for 'backpack' and add the Endurax Extra Large Camera Backpack to your cart. Then open the cart and look at the subtotal: if it is above $100, remove that item from the cart and add the SwissDigital Terabyte TSA-Friendly backpack instead. Finally report the cart subtotal (before tax).",
+    "start_url": "http://localhost:7770/",
+    "query": "backpack",
+    "check": "answer",
+    "answer_keywords": ["99.99"],
+    "max_steps": 16,
+    "note": "回退点：Endurax $119.99 加购 -> 购物车小计 119.99 > 100 -> 必须 Remove 再改加 SwissDigital $99.99 -> 小计 99.99（税 5% 后总计 104.99）。两个商品均实测可直接加购。要求报税前小计。"
+  },
+  {
+    "id": "t12_trim_cart_to_three",
+    "objective": "Search for 'backpack' and add products from the top of the result list downwards, in the order shown, until the cart holds three items — skip any product that refuses to be added because it requires a size or colour selection. Then open the cart: if the subtotal is above $250, remove the most expensive item and report the new subtotal (before tax).",
+    "start_url": "http://localhost:7770/",
+    "query": "backpack",
+    "check": "answer",
+    "answer_keywords": ["140.99"],
+    "max_steps": 20,
+    "note": "顺序：Endurax 119.99(可) -> SwissDigital 99.99(可) -> BAGSMAR 29.76(需选项,跳过) -> Greenbelly 41.00(可) => 三件小计 260.98 > 250 -> 删 Endurax => 140.99。同时考察'跳过不可加'与'删最贵'两种回退。"
+  }
+]
