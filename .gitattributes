@@ -1,0 +1,10 @@
+# 代码与文档统一换行
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+
+# 实验产物按字节原样保存（放最后，覆盖上面的规则）：
+# 一旦发生换行转换，MANIFEST.json 里记录的 sha256 就会对不上
+output/runs/** -text

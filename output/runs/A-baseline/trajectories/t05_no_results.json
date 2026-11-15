@@ -1,0 +1,18 @@
+{
+  "objective": "Search for the product 'xyzzy123' and report what the site shows for this query.",
+  "actions": [],
+  "task_website": "localhost:7770",
+  "reward": 0,
+  "meta": {
+    "task_id": "t05_no_results",
+    "policy": "dify",
+    "check": "answer",
+    "success": false,
+    "error": "URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)>",
+    "final_url": "http://localhost:7770/",
+    "n_steps": 0,
+    "answers": [],
+    "elapsed_s": 1.2,
+    "note": "negative-result handling; tests observation reading"
+  }
+}

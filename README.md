@@ -5,7 +5,7 @@
 
 - 非官方实现；上游项目：<https://github.com/oootttyyy/AgentDiagnose>
 - 依赖本地 **WebArena shopping 容器**与 **Dify 应用密钥**，二者均不随仓库分发
-- 实验产出（`output/runs/<run_id>/`）不入库，按下方流程在本地生成
+- 两轮实验记录（`output/runs/A-baseline/`、`output/runs/B-refactor/`）已入库；新跑出的批次默认不入库，按下方流程在本地生成
 - 每次运行的每条分数都带**轨迹指纹**；分数与轨迹对不上时 `correlate` 拒绝出数，而不是给一个数
 
 > **实验报告**见 [`docs/实验报告.md`](docs/实验报告.md)；**验收记录**见 [`docs/验收记录.md`](docs/验收记录.md)。
@@ -45,7 +45,7 @@
 │   ├── evidence/             # 产物来源的取证（漂移对照表 + 哈希）
 │   ├── 打分指南.md            # 标注人必读：五维定义、1–4 锚点、示例、误判
 │   └── 标注说明.md            # 标注数据来源与重标方法
-├── output/runs/<run_id>/     # 实验产物（不入库）：一次运行一个目录
+├── output/runs/<run_id>/     # 实验产物：A-baseline / B-refactor 已入库，其余忽略
 └── README.md
 ```
 

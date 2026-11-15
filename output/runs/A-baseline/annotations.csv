@@ -1,0 +1,60 @@
+﻿task_id,objective,success,n_steps,trace,rubric,backtrack_and_explore,task_decomposition,observation_reading,self_verification,objective_quality
+t01_backpack_first_price,Search for 'backpack' on the shopping site and report the price of the first product in the search results.,TRUE,2,"1. submit(8, ""backpack"")
+   理由：I need to search the shopping site for “backpack” using the search field so I can inspect the first result’s price.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. send_msg_to_user(""The price of the first product in the search results is $119.99."")
+   理由：The search results are already displayed, and the first product listed is the Endurax Extra Large Camera Backpack with a price of $119.99.
+   页面：text '$119.99' | text '$99.99' | [31] link 'Endurax Extra Large Camera Backpack Waterproof Drone backpacks for Photographers'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,4,4,3,4
+t02_add_home_product,Add the first product shown on the home page to your shopping cart.,TRUE,2,"1. click(26)
+   理由：The first product listed on the home page is the Pre-baked Gingerbread House Kit Value Pack, and its Add to Cart button is [26]. I’ll click that button to add it to the shopping cart.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. send_msg_to_user(""Added the first product shown on the home page to the shopping cart."")
+   理由：The first product on the home page is the Pre-baked Gingerbread House Kit, and its button already shows “Added,” confirming it has been placed in the cart. The task is complete.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,4,4,4,4
+t03_cheapest_backpack,"Among the 'backpack' search results on the first page, find the product with the lowest price and report its brand name.",FALSE,0,(无动作),1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,1,1,1,1,4
+t04_coffee_under_20,Search for 'coffee maker' and add any product priced below $20 to your cart.,FALSE,2,"1. submit(8, ""coffee maker"")
+   理由：I’ll search the site for “coffee maker” using the search box and then choose a qualifying product under $20.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. click(65)
+   理由：The Caramel Swirl coffee pods are priced at $11.31, which is below $20, so I will add that product to the cart.
+   页面：text '$34.99' | text '$22.56' | [31] link 'Puerto Rican Artists Edition Espresso Maker Aluminum StoveTop 6 Cup Coffee Maker with 4oz Cafe Oro Ground Coffee Sample (Puerto Rican Star/Coffee Plant)'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,3,2,1,4
+t05_no_results,Search for the product 'xyzzy123' and report what the site shows for this query.,FALSE,0,(无动作),1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,1,1,1,1,4
+t06_product_page_price,"Find the camera backpack made by Endurax, open its product page, and report its listed price.",FALSE,1,"1. submit(8, ""Endurax camera backpack"")
+   理由：I should search the store for the Endurax camera backpack using the available search box.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,2,2,1,4
+t07_cart_status,Open the shopping cart page and report whether the cart is currently empty.,TRUE,3,"1. click(7)
+   理由：I need to open the shopping cart page to check its contents. I'll click the ""My Cart"" link in the header.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. goto(""http://localhost:7770/checkout/cart"")
+   理由：The cart dropdown already indicates no items, but I should open the actual shopping cart page to confirm the cart state directly.
+   页面：text '$19.99' | text '$14.47' | [25] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+3. send_msg_to_user(""The cart is currently empty."")
+   理由：The cart page is open at the checkout/cart URL, and the page explicitly states “You have no items in your shopping cart.” Therefore, the cart is currently empty.
+   页面：RootWebArea 'Shopping Cart' | [1] link 'My Account' | [2] link 'My Wish List' | [3] link 'Sign In'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,4,4,4,4
+t08_most_expensive_backpack,"Among the 'backpack' search results on the first page, which product is the most expensive? Report its price.",TRUE,2,"1. submit(8, ""backpack"")
+   理由：I need to run a search for “backpack” so I can review the first page of results and compare prices.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. send_msg_to_user(""The most expensive product on the first page is the Lowpro LP36776 Lens Trekker 600 AW III Telephoto Lens Backpack, priced at $284.95."")
+   理由：I reviewed all product prices on the first page; the highest listed price is $284.95 for the Lowpro LP36776 Lens Trekker 600 AW III Telephoto Lens Backpack.
+   页面：text '$119.99' | text '$99.99' | [31] link 'Endurax Extra Large Camera Backpack Waterproof Drone backpacks for Photographers'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,4,3,3,4
+t09_vague_kitchen,Get something useful for the kitchen.,,4,"1. click(14)
+   理由：I’ll browse the Home & Kitchen category to find a practical kitchen item.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. click(103)
+   理由：The task is to get something useful for the kitchen, and the page has a dedicated “Kitchen & Dining” category, which is the best place to find an appropriate item.
+   页面：text '$169.99' | text '$199.99' | [31] link 'Magic Home Nightstands Bedroom with Drawers,Faux Marble Nightstands Side Tables with PU Leather and Titanium Legs Beside End Table for Living Room/Bedroom/Offic'
+3. click(78)
+   理由：The parchment baking paper is a practical, low-cost kitchen item and available on this page. I’ll add it to the cart to fulfill the task.
+   页面：text '$59.99' | text '$87.58' | [37] link 'Mug sporcelain Coffee Cup Ceramic Tea Cup Set Turkish Vintage Printing Fine Bone China Retro Dinner Set,180Ml With cover (Color : 180ml1)'
+4. send_msg_to_user(""Added If You Care Parchment Baking Paper (70 sq ft roll) to the cart—useful for baking and food prep."")
+   理由：The parchment baking paper is already in the cart and is a useful kitchen item, so the task is complete.
+   页面：text 'You added If You Care Parchment Baking Paper – 70 Sq Ft Roll - Unbleached, Chlorine Free, Greaseproof, Silicone Coated – Standard Size – Fits 13 Inch Pans to yo' | text '$59.99' | [38] link 'Mug sporcelain Coffee Cup Ceramic Tea Cup Set Turkish Vintage Printing Fine Bone China Retro Dinner Set,180Ml With cover (C",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,4,4,4,2
+t10_vague_gift,Buy a nice gift for a friend.,,3,"1. click(38)
+   理由：I’ll choose a highly rated gourmet tea gift item that seems suitable as a friendly gift, then proceed to purchase it.
+   页面：text '$19.99' | text '$14.47' | [24] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+2. click(7)
+   理由：The Elmwood Inn tea set is already in the cart and would make a nice gift, so I’ll open the cart to proceed with the purchase.
+   页面：text 'You added Elmwood Inn Fine Teas, Orange Vanilla Caffeine-free Fruit Infusion, 16-Ounce Pouch to your' | text '$19.99' | [25] link 'Pre-baked Gingerbread House Kit Value Pack, 17 oz., Pack of 2, Total 34 oz.'
+3. click(9)
+   理由：The cart already contains a giftable tea item, so I’ll proceed to checkout to complete the purchase.
+   页面：text '$19.36' | text '$19.36' | [10] link 'Elmwood Inn Fine Teas, Orange Vanilla Caffeine-free Fruit Infusion, 16-Ounce Pouch'",1–4 整数。4=优秀 3=良好 2=一般 1=差；backtrack 在“全程未走错、也无需回退”时填 N/A。objective_quality 只看任务目标，不看轨迹。,N/A,3,3,2,2

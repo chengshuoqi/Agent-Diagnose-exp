@@ -1,0 +1,76 @@
+{
+  "frozen_at": "2026-11-14T18:27:14+08:00",
+  "note": "A 基线冻结：一次采集(18:03)+同批判分(18:11)+人工标注(18:25)同源",
+  "files": {
+    "annotations.csv": {
+      "bytes": 9623,
+      "sha256": "eeccd38b69267f236d1ad5b5531610a0b3a11d9eb7afd0beeb668dae37b0afe3",
+      "mtime": "2026-11-14T18:26:46+08:00"
+    },
+    "annotations.md": {
+      "bytes": 11083,
+      "sha256": "6a31205277c25ff0de8ae26b1b9a1a61ec83be001987dc57b00fc49f5967b4b0",
+      "mtime": "2026-11-14T18:16:40+08:00"
+    },
+    "correlation.md": {
+      "bytes": 373,
+      "sha256": "231d2e13c450fce4d0f03f02b0e8c0cf20fa88d3b5dc01ff9741b45792e9719c",
+      "mtime": "2026-11-14T18:26:49+08:00"
+    },
+    "scores.json": {
+      "bytes": 38344,
+      "sha256": "6594eb404ea7c2ac9084c192623d7ceab6ae03e3df15d0fb2f7d2269a0078f66",
+      "mtime": "2026-11-14T18:11:54+08:00"
+    },
+    "trajectories/t01_backpack_first_price.json": {
+      "bytes": 16836,
+      "sha256": "4e10d523b699e6a136109a2abf3f699e9d404a0b5c1e61cb9ba6ffbdb38e2e3c",
+      "mtime": "2026-11-14T18:03:32+08:00"
+    },
+    "trajectories/t02_add_home_product.json": {
+      "bytes": 16427,
+      "sha256": "41d1c089f863cbc54b2647359d1169eb03da0df8f2918c34194eba8e71775356",
+      "mtime": "2026-11-14T18:03:42+08:00"
+    },
+    "trajectories/t03_cheapest_backpack.json": {
+      "bytes": 648,
+      "sha256": "414ffc9e78ca116ba553ce3535a44d037e2e08d09f7559be3f8a3464830ded00",
+      "mtime": "2026-11-14T18:03:44+08:00"
+    },
+    "trajectories/t04_coffee_under_20.json": {
+      "bytes": 16863,
+      "sha256": "4cd8d352c67d02712c53121ce55ac008afe6d97d570c11b99c58daff5880a44b",
+      "mtime": "2026-11-14T18:03:56+08:00"
+    },
+    "trajectories/t05_no_results.json": {
+      "bytes": 601,
+      "sha256": "ca846bc51587ef84d4f7dab4532acd73a686c1fd41bacad9f60d0373b981c83a",
+      "mtime": "2026-11-14T18:03:58+08:00"
+    },
+    "trajectories/t06_product_page_price.json": {
+      "bytes": 8003,
+      "sha256": "d6c461a766207dba544a4a2829ac2d86528762565de71d5e6ef1a829a49a4d13",
+      "mtime": "2026-11-14T18:04:04+08:00"
+    },
+    "trajectories/t07_cart_status.json": {
+      "bytes": 19252,
+      "sha256": "1b8cf7107e32da30b1f4b863fcb1fbbf081ede17a40e38ff89c4949d3da5ad8e",
+      "mtime": "2026-11-14T18:04:17+08:00"
+    },
+    "trajectories/t08_most_expensive_backpack.json": {
+      "bytes": 18370,
+      "sha256": "77dbae45bad6e1eaa1b7579db44885b120941706938c7f332f88a446cee43fa8",
+      "mtime": "2026-11-14T18:04:27+08:00"
+    },
+    "trajectories/t09_vague_kitchen.json": {
+      "bytes": 37519,
+      "sha256": "7a95ed55d0d60c3dc6ee4bb05a14bcca8ccf7ce4288f6b54524d6373fc5d1a83",
+      "mtime": "2026-11-14T18:04:45+08:00"
+    },
+    "trajectories/t10_vague_gift.json": {
+      "bytes": 26650,
+      "sha256": "69fad33617a095eed1c20fcb8ad2ce0eea30c6ff56eac24faf0f3e19b9238e59",
+      "mtime": "2026-11-14T18:05:02+08:00"
+    }
+  }
+}

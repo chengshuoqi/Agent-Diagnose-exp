@@ -1,0 +1,533 @@
+{
+  "t01_backpack_first_price": {
+    "objective": "Search for 'backpack' on the shopping site and report the price of the first product in the search results.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 0.75,
+        "observation_reading": 0.5,
+        "self_verification": 0.25
+      },
+      "overall": 0.5,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The task was a simple two-step search-and-report flow with no indication that the agent took a wrong turn, so no backtracking was required. That said, the agent also never had to reason about alternative paths.",
+        "task_decomposition": "The agent implicitly decomposed the task into the correct sub-goals: enter/submit the 'backpack' query, identify the first result in the listing order, and report its price. For such a short task this is adequate, but it is stated only loosely rather than as explicit checked steps (e.g., no explicit step to confirm ranking of results).",
+        "observation_reading": "The agent did not summarize the search-results observation at all (no listing of items, no note about which item appears first or how the ranking is determined). It only asserts the product name and price, so the reading of the page is asserted rather than demonstrated.",
+        "self_verification": "After submitting the search the agent immediately reported a price without any verification that the named product is actually the first item in the results, nor any re-check of the price against the page. No verification behavior is visible."
+      }
+    },
+    "objective_quality": {
+      "score": 1.0,
+      "justification": "The objective is clear, specific, and highly actionable. It defines the exact search query ('backpack'), the target environment ('the shopping site'), the action to perform (search), and the required output (the price of the first product in the search results). Success can be directly verified by confirming that the search was performed and that the price corresponding to the first result was reported. There is minor potential ambiguity around which specific shopping site is intended and how 'first product' is determined if sponsored or promoted results are present, but these do not materially reduce the objective's actionability. Overall, it contains concrete goals and clear completion criteria."
+    },
+    "success": true,
+    "n_steps": 2,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The task was a simple two-step search-and-report flow with no indication that the agent took a wrong turn, so no backtracking was required. That said, the agent also never had to reason about alternative paths."
+      },
+      "task_decomposition": {
+        "score": 3,
+        "justification": "The agent implicitly decomposed the task into the correct sub-goals: enter/submit the 'backpack' query, identify the first result in the listing order, and report its price. For such a short task this is adequate, but it is stated only loosely rather than as explicit checked steps (e.g., no explicit step to confirm ranking of results)."
+      },
+      "observation_reading": {
+        "score": 2,
+        "justification": "The agent did not summarize the search-results observation at all (no listing of items, no note about which item appears first or how the ranking is determined). It only asserts the product name and price, so the reading of the page is asserted rather than demonstrated."
+      },
+      "self_verification": {
+        "score": 1,
+        "justification": "After submitting the search the agent immediately reported a price without any verification that the named product is actually the first item in the results, nor any re-check of the price against the page. No verification behavior is visible."
+      }
+    },
+    "traj_sha256": "61e7f9bd0496a21f0bd4bd383fcb969a2f4ff8798eb6d911cdae18adfb4f5a5c",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:23:51Z"
+  },
+  "t02_add_home_product": {
+    "objective": "Add the first product shown on the home page to your shopping cart.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 0.75,
+        "observation_reading": 1.0,
+        "self_verification": 1.0
+      },
+      "overall": 0.9166666666666666,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The task was completed with a single straightforward click on the correct product. There was no wrong turn or need to revisit a previous page or state.",
+        "task_decomposition": "The agent implicitly broke the simple task into locating the first product, clicking its Add to Cart button, and confirming the result. This covered the task adequately, though no explicit step-by-step plan was stated.",
+        "observation_reading": "The agent correctly identified the first product and its Add to Cart control, then accurately noticed the button changed to 'Added' after the click. It focused on the key information needed to complete the task.",
+        "self_verification": "After clicking, the agent checked the button state and used the 'Added' confirmation to verify that the item was in the shopping cart before reporting success. This was a reasonable and sufficient verification for the simple task."
+      }
+    },
+    "objective_quality": {
+      "score": 1.0,
+      "justification": "The objective is clear, concrete, and actionable. It specifies a single operation—add a product to the shopping cart—and defines exactly which product to select: the first product shown on the home page. Success can be verified by checking that the specified product appears in the cart. Although the specific website and product identity are not stated, those are discoverable from the current home page context, and the instruction does not rely on vague exploratory goals. This is an excellent task objective with a well-defined target and outcome."
+    },
+    "success": true,
+    "n_steps": 2,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The task was completed with a single straightforward click on the correct product. There was no wrong turn or need to revisit a previous page or state."
+      },
+      "task_decomposition": {
+        "score": 3,
+        "justification": "The agent implicitly broke the simple task into locating the first product, clicking its Add to Cart button, and confirming the result. This covered the task adequately, though no explicit step-by-step plan was stated."
+      },
+      "observation_reading": {
+        "score": 4,
+        "justification": "The agent correctly identified the first product and its Add to Cart control, then accurately noticed the button changed to 'Added' after the click. It focused on the key information needed to complete the task."
+      },
+      "self_verification": {
+        "score": 4,
+        "justification": "After clicking, the agent checked the button state and used the 'Added' confirmation to verify that the item was in the shopping cart before reporting success. This was a reasonable and sufficient verification for the simple task."
+      }
+    },
+    "traj_sha256": "bf9acb3698d36b243bc972a76922ee0041e5ce4bd964c9c411bafba36b4f5bd8",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:24:37Z"
+  },
+  "t03_cheapest_backpack": {
+    "objective": "Among the 'backpack' search results on the first page, find the product with the lowest price and report its brand name.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 1.0,
+        "observation_reading": 1.0,
+        "self_verification": 0.5
+      },
+      "overall": 0.8333333333333334,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The task required only a single search of the first results page, and the agent's first attempt succeeded. There was no wrong path taken and thus no need to revisit earlier states or try alternatives.",
+        "task_decomposition": "Although the task is simple, the agent decomposed it into the two necessary actions: (1) submit the 'backpack' search and (2) identify the lowest-priced item from the first page and report its brand. This covers the full task with no missing steps.",
+        "observation_reading": "The agent accurately summarized the search results page, noting the number of results (12) and extracting the key information needed: the lowest price ($24.98) and the corresponding product/brand (ERIHOP Black Backpack Purse).",
+        "self_verification": "The agent's reasoning implies it scanned the 12 results to find the minimum price, but there is no explicit verification step (e.g., re-checking that no other listed item is cheaper) before reporting the answer. It shows only weak signs of verifying its result against the objective."
+      }
+    },
+    "objective_quality": {
+      "score": 1.0,
+      "justification": "The objective is well-specified and actionable: it defines a concrete search operation ('backpack' search results), a bounded scope (first page only), a precise selection criterion (lowest price among those results), and a concrete deliverable (the product's brand name). This gives an unambiguous success condition that can be verified — the reported brand must correspond to the minimum-priced item on page one of the backpack search. The only minor ambiguity is that the target platform/site is not named, which could matter in a multi-site environment; however, the task is still clearly executable and non-exploratory, with no vague 'investigate' or 'explore' framing. Hence excellent actionability with strong success criteria, discounted only slightly for the missing platform specification."
+    },
+    "success": true,
+    "n_steps": 2,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The task required only a single search of the first results page, and the agent's first attempt succeeded. There was no wrong path taken and thus no need to revisit earlier states or try alternatives."
+      },
+      "task_decomposition": {
+        "score": 4,
+        "justification": "Although the task is simple, the agent decomposed it into the two necessary actions: (1) submit the 'backpack' search and (2) identify the lowest-priced item from the first page and report its brand. This covers the full task with no missing steps."
+      },
+      "observation_reading": {
+        "score": 4,
+        "justification": "The agent accurately summarized the search results page, noting the number of results (12) and extracting the key information needed: the lowest price ($24.98) and the corresponding product/brand (ERIHOP Black Backpack Purse)."
+      },
+      "self_verification": {
+        "score": 2,
+        "justification": "The agent's reasoning implies it scanned the 12 results to find the minimum price, but there is no explicit verification step (e.g., re-checking that no other listed item is cheaper) before reporting the answer. It shows only weak signs of verifying its result against the objective."
+      }
+    },
+    "traj_sha256": "f83048d18cb8c952aba858bd0f49e950ba21ef1674c465f86d18640c7bff415e",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:24:55Z"
+  },
+  "t04_coffee_under_20": {
+    "objective": "Search for 'coffee maker' and add any product priced below $20 to your cart.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": 0.5,
+        "task_decomposition": 0.75,
+        "observation_reading": 0.75,
+        "self_verification": 0.5
+      },
+      "overall": 0.625,
+      "dimensions_used": [
+        "backtrack_and_explore",
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 4,
+      "justifications": {
+        "backtrack_and_explore": "The agent does recognize wrong paths (e.g., Step 3: 'The current page is a coffee pod product, not a coffee maker') and explicitly re-submits the search to return to the results page (Steps 3, 6, 8). However, it repeatedly returns to the exact same search results and makes the same mistake multiple times (Step 5 repeats the Step 2 pattern of clicking an $11.31 item that doesn't get added), looping instead of trying a genuinely different alternative. Explicit backtracking is present but executed poorly.",
+        "task_decomposition": "The agent does decompose the task reasonably: search for 'coffee maker' (Step 1), review results for an item under $20 (Steps 2, 5, 7), add it to the cart, and verify the cart (Step 4). The major gap is that verification is mentioned but never actually carried through, and there is no contingency plan for when the 'Add to Cart' click doesn't seem to work, leading to a repetitive cycle.",
+        "observation_reading": "Each step includes a short, generally accurate reading of the observation—prices ($11.31, $10.99) are correctly identified and in Step 3 the agent correctly notices it landed on a coffee pod product page rather than a coffee maker. However, it repeatedly misses critical information: it never notices that the add-to-cart action did not result in a confirmed cart state, which is why it keeps restarting the search.",
+        "self_verification": "There is a sign of verification intent in Step 4 ('I should verify it is in the cart before finishing'), but the agent abandons this check and returns to clicking products, and it never confirms at the end that the item is actually in the cart. The outcome is never validated against the objective."
+      }
+    },
+    "objective_quality": {
+      "score": 1.0,
+      "justification": "The objective is highly specific and actionable: it identifies the exact search term ('coffee maker'), a concrete selection criterion (price below $20), and a clear final action (add the product to the cart). Success can be verified by confirming that a qualifying product was found and placed in the cart. While 'any product' allows the agent some discretion, that discretion is bounded by explicit criteria and does not make the task exploratory or vague."
+    },
+    "success": false,
+    "n_steps": 8,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": 2,
+        "justification": "The agent does recognize wrong paths (e.g., Step 3: 'The current page is a coffee pod product, not a coffee maker') and explicitly re-submits the search to return to the results page (Steps 3, 6, 8). However, it repeatedly returns to the exact same search results and makes the same mistake multiple times (Step 5 repeats the Step 2 pattern of clicking an $11.31 item that doesn't get added), looping instead of trying a genuinely different alternative. Explicit backtracking is present but executed poorly."
+      },
+      "task_decomposition": {
+        "score": 3,
+        "justification": "The agent does decompose the task reasonably: search for 'coffee maker' (Step 1), review results for an item under $20 (Steps 2, 5, 7), add it to the cart, and verify the cart (Step 4). The major gap is that verification is mentioned but never actually carried through, and there is no contingency plan for when the 'Add to Cart' click doesn't seem to work, leading to a repetitive cycle."
+      },
+      "observation_reading": {
+        "score": 3,
+        "justification": "Each step includes a short, generally accurate reading of the observation—prices ($11.31, $10.99) are correctly identified and in Step 3 the agent correctly notices it landed on a coffee pod product page rather than a coffee maker. However, it repeatedly misses critical information: it never notices that the add-to-cart action did not result in a confirmed cart state, which is why it keeps restarting the search."
+      },
+      "self_verification": {
+        "score": 2,
+        "justification": "There is a sign of verification intent in Step 4 ('I should verify it is in the cart before finishing'), but the agent abandons this check and returns to clicking products, and it never confirms at the end that the item is actually in the cart. The outcome is never validated against the objective."
+      }
+    },
+    "traj_sha256": "b99975bf8882a92fefe9c521f58da4dbf1cf19a5d04375b0762ec35cb34534fe",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:25:14Z"
+  },
+  "t05_no_results": {
+    "objective": "Search for the product 'xyzzy123' and report what the site shows for this query.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 1.0,
+        "observation_reading": 1.0,
+        "self_verification": 0.75
+      },
+      "overall": 0.9166666666666666,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The task required a single search-and-report action. The agent entered the query, submitted it, and the site returned 'no results', which is a legitimate terminal outcome. There was no wrong turn to recover from, so backtracking was not needed.",
+        "task_decomposition": "The task is inherently simple, and the agent decomposed it correctly into the two necessary steps: (1) type the exact query into the search field and submit, (2) report the resulting page content. No steps were missing for this objective.",
+        "observation_reading": "The agent accurately captured the key content of the results page, quoting 'Your search returned no results.' and correctly recognizing that it was the answer to the query rather than a page failure or loading issue. Its reasoning identifies the decisive information on the page immediately.",
+        "self_verification": "The agent did confirm the results page was open and displayed the no-results message before reporting, which is a basic check against the objective. However, it did not do any additional validation (e.g., confirming the query string was exactly 'xyzzy123' in the search field, or noting the absence of any fuzzy/related results) before concluding, so verification was adequate but not thorough."
+      }
+    },
+    "objective_quality": {
+      "score": 0.5,
+      "justification": "The objective includes one concrete action (searching for 'xyzzy123') and a specific query string, which makes it partially actionable. However, it refers vaguely to 'the site' without identifying a website or providing a URL, so the agent cannot know where to perform the search. The reporting requirement ('report what the site shows') is also broad and lacks concrete success criteria, such as listing the product name, price, availability, search-result count, or whether the item exists. Overall, it is a mix of an actionable search step and ambiguous, exploratory elements."
+    },
+    "success": true,
+    "n_steps": 2,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The task required a single search-and-report action. The agent entered the query, submitted it, and the site returned 'no results', which is a legitimate terminal outcome. There was no wrong turn to recover from, so backtracking was not needed."
+      },
+      "task_decomposition": {
+        "score": 4,
+        "justification": "The task is inherently simple, and the agent decomposed it correctly into the two necessary steps: (1) type the exact query into the search field and submit, (2) report the resulting page content. No steps were missing for this objective."
+      },
+      "observation_reading": {
+        "score": 4,
+        "justification": "The agent accurately captured the key content of the results page, quoting 'Your search returned no results.' and correctly recognizing that it was the answer to the query rather than a page failure or loading issue. Its reasoning identifies the decisive information on the page immediately."
+      },
+      "self_verification": {
+        "score": 3,
+        "justification": "The agent did confirm the results page was open and displayed the no-results message before reporting, which is a basic check against the objective. However, it did not do any additional validation (e.g., confirming the query string was exactly 'xyzzy123' in the search field, or noting the absence of any fuzzy/related results) before concluding, so verification was adequate but not thorough."
+      }
+    },
+    "traj_sha256": "3e60f9b154773ba71bf821c5e16e7a4aab8db2dfad1a47d8ad2d1f75465d4b08",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:25:30Z"
+  },
+  "t06_product_page_price": {
+    "objective": "Find the camera backpack made by Endurax, open its product page, and report its listed price.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 1.0,
+        "observation_reading": 1.0,
+        "self_verification": 1.0
+      },
+      "overall": 1.0,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The agent followed a direct, correct path from search to product page to price report, so there was no need to go back or try alternatives.",
+        "task_decomposition": "The simple task was broken down appropriately: search for the product, open the matching result, then report the visible price.",
+        "observation_reading": "The agent accurately identified the relevant search result and extracted the key information from the product page, namely the $119.99 price.",
+        "self_verification": "The agent explicitly opened the product page to verify the price and confirmed that the current page was the Endurax backpack page before reporting the result."
+      }
+    },
+    "objective_quality": {
+      "score": 0.75,
+      "justification": "The objective is well-structured and action-oriented: it specifies a distinct entity (the camera backpack made by Endurax), a sequence of concrete actions (find it, open its product page), and a clear deliverable (report the listed price). This gives an unambiguous success criterion — either the price is reported or it isn't — and leaves essentially no open-ended exploration beyond locating the item. It stops short of a 4 because several parameters remain underspecified: the target site/marketplace is not named, the exact model or variant (Endurax makes multiple backpacks) is not pinned down, and expectations for handling ambiguity (e.g., verifying the manufacturer, reporting currency/price format, or what to do if no price is listed) are absent. These gaps could force the agent to make judgment calls, but they are relatively minor and the core task remains specific and directly executable."
+    },
+    "success": true,
+    "n_steps": 3,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The agent followed a direct, correct path from search to product page to price report, so there was no need to go back or try alternatives."
+      },
+      "task_decomposition": {
+        "score": 4,
+        "justification": "The simple task was broken down appropriately: search for the product, open the matching result, then report the visible price."
+      },
+      "observation_reading": {
+        "score": 4,
+        "justification": "The agent accurately identified the relevant search result and extracted the key information from the product page, namely the $119.99 price."
+      },
+      "self_verification": {
+        "score": 4,
+        "justification": "The agent explicitly opened the product page to verify the price and confirmed that the current page was the Endurax backpack page before reporting the result."
+      }
+    },
+    "traj_sha256": "b95c201feb1c2b5d7f1f12b193aee673bc0aa372c473a426884d7f29f757f6d3",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:25:44Z"
+  },
+  "t07_cart_status": {
+    "objective": "Open the shopping cart page and report whether the cart is currently empty.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 1.0,
+        "observation_reading": 1.0,
+        "self_verification": 0.75
+      },
+      "overall": 0.9166666666666666,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The task required only a single navigation step (clicking the 'My Cart' link) followed by reading the resulting status text. The agent took the correct path on the first attempt, so there was no wrong path or dead end that would have required going back or trying alternatives.",
+        "task_decomposition": "Although the task is simple, the agent still decomposed it into the two necessary sub-goals: (1) open the shopping cart page via the 'My Cart' link, and (2) determine and report the cart's contents. These steps fully cover the objective, with nothing left out.",
+        "observation_reading": "In Step 2 the agent directly cites the key on-page evidence — the status text 'You have no items in your shopping cart' — and correctly interprets it as meaning the cart is empty. It identified the single most important piece of information on the page and summarized it accurately.",
+        "self_verification": "The agent grounded its final answer in the explicit cart status text, which is a reasonable check against the objective. However, it performed no further confirmation (e.g., checking item rows, cart count/badge, or re-reading the page) before concluding, so verification is adequate but not thorough."
+      }
+    },
+    "objective_quality": {
+      "score": 1.0,
+      "justification": "The objective is clear, specific, and actionable. It defines a concrete operation ('open the shopping cart page') and an explicit deliverable ('report whether the cart is currently empty'). Success is easy to verify: the agent must navigate to the cart page and state whether it contains items. There are no vague exploratory elements; the scope is narrowly bounded and requires no further clarification."
+    },
+    "success": true,
+    "n_steps": 2,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The task required only a single navigation step (clicking the 'My Cart' link) followed by reading the resulting status text. The agent took the correct path on the first attempt, so there was no wrong path or dead end that would have required going back or trying alternatives."
+      },
+      "task_decomposition": {
+        "score": 4,
+        "justification": "Although the task is simple, the agent still decomposed it into the two necessary sub-goals: (1) open the shopping cart page via the 'My Cart' link, and (2) determine and report the cart's contents. These steps fully cover the objective, with nothing left out."
+      },
+      "observation_reading": {
+        "score": 4,
+        "justification": "In Step 2 the agent directly cites the key on-page evidence — the status text 'You have no items in your shopping cart' — and correctly interprets it as meaning the cart is empty. It identified the single most important piece of information on the page and summarized it accurately."
+      },
+      "self_verification": {
+        "score": 3,
+        "justification": "The agent grounded its final answer in the explicit cart status text, which is a reasonable check against the objective. However, it performed no further confirmation (e.g., checking item rows, cart count/badge, or re-reading the page) before concluding, so verification is adequate but not thorough."
+      }
+    },
+    "traj_sha256": "7ed00c0d20e83a52e3f3ec38e3ae4c7649ca67c1d3c90599be9119558422f9a2",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:25:57Z"
+  },
+  "t08_most_expensive_backpack": {
+    "objective": "Among the 'backpack' search results on the first page, which product is the most expensive? Report its price.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 0.25,
+        "observation_reading": 0.25,
+        "self_verification": 0.25
+      },
+      "overall": 0.25,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The trajectory is only two steps long (submit the 'backpack' query, then report an answer) and contains no visible wrong turn, so there was no occasion to return to a previous page or branch into alternatives. That said, the agent also never revisited or re-checked the results page after claiming to compare prices, so this dimension simply cannot be exercised here.",
+        "task_decomposition": "The task naturally decomposes into: run the 'backpack' search, open/scan the first page of results, enumerate each backpack's price, compare them, and report the maximum with its product name. The agent performed only the first step and then jumped directly to the final answer, skipping the enumeration and comparison steps entirely. No explicit plan or intermediate sub-goals were formed.",
+        "observation_reading": "After submitting the search, the agent never reported or summarized what the results page contained — no list of products, no prices, no count of items on the page. Step 2's claim of having 'compared the listed first-page backpack prices' is unsupported by any observed evidence, indicating the agent did not actually read the observation before answering.",
+        "self_verification": "The agent delivered a final price ($284.95) immediately after the search action with no confirmation step: it did not re-inspect the results list, re-read prices, or confirm that the cited product (Lowepro Lens Trekker 600 AW III) was actually the highest-priced backpack on page one. There is no checking of the result against the objective."
+      }
+    },
+    "objective_quality": {
+      "score": 1.0,
+      "justification": "The objective is clear, specific, and actionable. It defines a precise scope ('backpack' search results on the first page), a concrete selection criterion (the most expensive product), and a concrete deliverable (report its price). This creates a verifiable success condition rather than an open-ended exploration. The only minor ambiguity is the implicit search context/site, but within the task setting this is readily inferable, so it does not diminish actionability. The task requires a defined sequence of steps (run the search, inspect first-page results, compare prices, identify the maximum, report the price) and has an unambiguous correct answer. Therefore it rates as Excellent."
+    },
+    "success": true,
+    "n_steps": 2,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The trajectory is only two steps long (submit the 'backpack' query, then report an answer) and contains no visible wrong turn, so there was no occasion to return to a previous page or branch into alternatives. That said, the agent also never revisited or re-checked the results page after claiming to compare prices, so this dimension simply cannot be exercised here."
+      },
+      "task_decomposition": {
+        "score": 1,
+        "justification": "The task naturally decomposes into: run the 'backpack' search, open/scan the first page of results, enumerate each backpack's price, compare them, and report the maximum with its product name. The agent performed only the first step and then jumped directly to the final answer, skipping the enumeration and comparison steps entirely. No explicit plan or intermediate sub-goals were formed."
+      },
+      "observation_reading": {
+        "score": 1,
+        "justification": "After submitting the search, the agent never reported or summarized what the results page contained — no list of products, no prices, no count of items on the page. Step 2's claim of having 'compared the listed first-page backpack prices' is unsupported by any observed evidence, indicating the agent did not actually read the observation before answering."
+      },
+      "self_verification": {
+        "score": 1,
+        "justification": "The agent delivered a final price ($284.95) immediately after the search action with no confirmation step: it did not re-inspect the results list, re-read prices, or confirm that the cited product (Lowepro Lens Trekker 600 AW III) was actually the highest-priced backpack on page one. There is no checking of the result against the objective."
+      }
+    },
+    "traj_sha256": "72ab45b9a3e49e5c2931c4bfdc1736b264df3034fb1f003ddedd7e2c55de88dd",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:26:15Z"
+  },
+  "t09_vague_kitchen": {
+    "objective": "Get something useful for the kitchen.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 1.0,
+        "observation_reading": 1.0,
+        "self_verification": 1.0
+      },
+      "overall": 1.0,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The agent followed a direct, correct path: Home & Kitchen → Kitchen & Dining → a suitable item → add to cart. There was no wrong turn or need to revisit a previous state.",
+        "task_decomposition": "The simple task was broken into clear, complete steps: navigate to the relevant category, narrow to kitchen items, choose a practical consumable, add it to the cart, and report completion.",
+        "observation_reading": "At each step the agent correctly interpreted the available page information, identifying the Home & Kitchen menu, the Kitchen & Dining category, the parchment baking paper as a kitchen item, and the confirmation that it was added to the cart.",
+        "self_verification": "Before reporting completion, the agent confirmed that the item was practical for the kitchen and that the page showed it had been added to the cart, satisfying the objective."
+      }
+    },
+    "objective_quality": {
+      "score": 0.25,
+      "justification": "The objective 'Get something useful for the kitchen' is entirely exploratory and contains no concrete targets. It does not specify what item to obtain (utensil, appliance, ingredient, consumable), any budget or quantity, where to acquire it, or how to judge 'useful.' There is no measurable success criterion and no way to verify completion—almost any kitchen-related purchase or acquisition would technically satisfy it, and almost any interpretation could be argued as failing it. Because it lacks any specific, actionable goal or acceptance criteria, it falls into the lowest category."
+    },
+    "success": null,
+    "n_steps": 4,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The agent followed a direct, correct path: Home & Kitchen → Kitchen & Dining → a suitable item → add to cart. There was no wrong turn or need to revisit a previous state."
+      },
+      "task_decomposition": {
+        "score": 4,
+        "justification": "The simple task was broken into clear, complete steps: navigate to the relevant category, narrow to kitchen items, choose a practical consumable, add it to the cart, and report completion."
+      },
+      "observation_reading": {
+        "score": 4,
+        "justification": "At each step the agent correctly interpreted the available page information, identifying the Home & Kitchen menu, the Kitchen & Dining category, the parchment baking paper as a kitchen item, and the confirmation that it was added to the cart."
+      },
+      "self_verification": {
+        "score": 4,
+        "justification": "Before reporting completion, the agent confirmed that the item was practical for the kitchen and that the page showed it had been added to the cart, satisfying the objective."
+      }
+    },
+    "traj_sha256": "0fa91f969104abd37274d036ee9e1dc35da16bfd30cb2d66b712f7ede4822a96",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:26:30Z"
+  },
+  "t10_vague_gift": {
+    "objective": "Buy a nice gift for a friend.",
+    "reasoning_quality": {
+      "dimensions": {
+        "backtrack_and_explore": null,
+        "task_decomposition": 0.75,
+        "observation_reading": 0.75,
+        "self_verification": 0.75
+      },
+      "overall": 0.75,
+      "dimensions_used": [
+        "task_decomposition",
+        "observation_reading",
+        "self_verification"
+      ],
+      "n_dims_used": 3,
+      "justifications": {
+        "backtrack_and_explore": "The agent followed a coherent path—search for a gift, select a suitable item, open the cart, and proceed to checkout—without taking an obvious wrong-page detour. Its later uncertainty about element IDs is a comprehension issue, not evidence that it needed to backtrack.",
+        "task_decomposition": "It reasonably breaks the purchase into search, product selection, cart review, checkout, and shipping-form completion, and it notes the need for payment/order placement. However, it does not plan gift-selection criteria or a final order-review step in much detail.",
+        "observation_reading": "Most steps accurately summarize the page state, such as the cart item and subtotal, the shipping step, the email entry, and the remaining blank fields. Still, Step 8 misreads earlier action IDs and is uncertain about important address/country fields.",
+        "self_verification": "The agent checks that the selected item is gift-appropriate and verifies the cart contents, subtotal, and some shipping-form state. It does not thoroughly validate all checkout fields or review the completed order before proceeding."
+      }
+    },
+    "objective_quality": {
+      "score": 0.5,
+      "justification": "The objective names a concrete action ('buy a gift') and a target recipient ('a friend'), so it is not purely exploratory — there is a real deliverable. However, it is severely underspecified: there is no budget, no information about the friend's interests, age, or relationship, no occasion or deadline, no definition of what 'nice' means, and no criteria for judging success (e.g., delivered on time, within budget, recipient pleased). 'Nice' is subjective and unmeasurable, leaving the agent to guess at scope and constraints. This makes it a mix of an actionable verb with largely vague, open-ended content, which fits the 'Mediocre' level rather than 'Good'. To reach a 3 or 4, it would need concrete parameters such as a budget range, occasion, deadline, and at least a few preferences or acceptance criteria."
+    },
+    "success": null,
+    "n_steps": 8,
+    "raw_reasoning": {
+      "backtrack_and_explore": {
+        "score": "N/A",
+        "justification": "The agent followed a coherent path—search for a gift, select a suitable item, open the cart, and proceed to checkout—without taking an obvious wrong-page detour. Its later uncertainty about element IDs is a comprehension issue, not evidence that it needed to backtrack."
+      },
+      "task_decomposition": {
+        "score": 3,
+        "justification": "It reasonably breaks the purchase into search, product selection, cart review, checkout, and shipping-form completion, and it notes the need for payment/order placement. However, it does not plan gift-selection criteria or a final order-review step in much detail."
+      },
+      "observation_reading": {
+        "score": 3,
+        "justification": "Most steps accurately summarize the page state, such as the cart item and subtotal, the shipping step, the email entry, and the remaining blank fields. Still, Step 8 misreads earlier action IDs and is uncertain about important address/country fields."
+      },
+      "self_verification": {
+        "score": 3,
+        "justification": "The agent checks that the selected item is gift-appropriate and verifies the cart contents, subtotal, and some shipping-form state. It does not thoroughly validate all checkout fields or review the completed order before proceeding."
+      }
+    },
+    "traj_sha256": "855e3b94ae4944463003f7c08424f2d1ee704a3bd1f4161cb0d1f17d97c366b8",
+    "run_id": "B-refactor",
+    "judge_model": "dify:unknown@api.dify.ai",
+    "prompt_sha256": "13e76676e17f17aaa89af620805d4f17f39aff44c085b431b602fbd56b0ebf1c",
+    "scored_at": "2026-11-14T12:33:06Z"
+  }
+}

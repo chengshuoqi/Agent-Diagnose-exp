@@ -1,0 +1,24 @@
+{
+  "run_id": "B-refactor",
+  "policy": "dify",
+  "base_url": "http://localhost:7770",
+  "tasks_file": "D:\\University\\Year_1\\Software\\小组作业\\repro\\data\\tasks_shopping.json",
+  "tasks_sha256": "7ae3839e755fa806585d9463ba5f8b6ebc77390d494c4d7c78b9a8f4130f37e8",
+  "n_tasks": 10,
+  "written": [
+    "t01_backpack_first_price",
+    "t02_add_home_product",
+    "t03_cheapest_backpack",
+    "t04_coffee_under_20",
+    "t05_no_results",
+    "t06_product_page_price",
+    "t07_cart_status",
+    "t08_most_expensive_backpack",
+    "t09_vague_kitchen",
+    "t10_vague_gift"
+  ],
+  "skipped": [],
+  "started_at": "2026-11-14T11:25:54Z",
+  "finished_at": "2026-11-14T11:29:02Z",
+  "elapsed_s": 187.8
+}
