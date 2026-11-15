@@ -7,7 +7,7 @@
     "check": "answer",
     "answer_keywords": ["99.99"],
     "max_steps": 16,
-    "note": "回退点：Endurax $119.99 加购 -> 购物车小计 119.99 > 100 -> 必须 Remove 再改加 SwissDigital $99.99 -> 小计 99.99（税 5% 后总计 104.99）。两个商品均实测可直接加购。要求报税前小计。"
+    "note": "[状态：ground truth 已核对，当前 agent 跑不通] 回退点：Endurax $119.99 -> 小计 119.99 > 100 -> Remove -> 改加 SwissDigital $99.99 -> 小计 99.99（税后 104.99）。两个商品均实测可直接加购。2026-11-14 实测：agent 在 4-8 步内反复点击同一元素 id、原地打转，16 步未完成（见 issue #8 / #11）。"
   },
   {
     "id": "t12_trim_cart_to_three",
@@ -17,6 +17,6 @@
     "check": "answer",
     "answer_keywords": ["140.99"],
     "max_steps": 20,
-    "note": "顺序：Endurax 119.99(可) -> SwissDigital 99.99(可) -> BAGSMAR 29.76(需选项,跳过) -> Greenbelly 41.00(可) => 三件小计 260.98 > 250 -> 删 Endurax => 140.99。同时考察'跳过不可加'与'删最贵'两种回退。"
+    "note": "[状态：ground truth 已核对，当前 agent 跑不通] 顺序：Endurax 119.99(可) -> SwissDigital 99.99(可) -> BAGSMAR 29.76(需选项,跳过) -> Greenbelly 41.00(可) => 三件 260.98 > 250 -> 删 Endurax => 140.99。2026-11-14 实测：20 步未完成，同样卡在重复点击（见 issue #8 / #11）。"
   }
 ]
